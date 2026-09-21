@@ -41,15 +41,7 @@
 }
 </style>
 <style>
-.youtube-music-player{
-  position:fixed;
-  width:1px;
-  height:1px;
-  left:-9999px;
-  top:-9999px;
-  overflow:hidden;
-  pointer-events:none;
-}
+
   /* ============================================================
      [2] 색상 변수
      --ink       : #5a4a4d (진한 그레이시 브라운) → 본문 기본 글자색
@@ -381,7 +373,7 @@
 </style>
 </head>
 <body>
-<div id="youtubeMusicPlayer" class="youtube-music-player"></div>
+<audio id="bgm" loop preload="auto"> <source src="https://heesohan.github.io/sohee/Pit-A-Pat.mp3"type="audio/mpeg"> </audio>
 <!-- ============================================================
      [16] 전역 SVG 정의
      - organzaMesh      : 가는 대각선 시어(sheer) 메쉬 (흰색) → 하트/팝업배경 공통 사용
@@ -644,7 +636,7 @@
         const msg = document.getElementById('celebrateMsg');
         const overlay = document.getElementById('popup-overlay');
         const key = btn.getAttribute('data-key');
-        playYoutubeMusic();
+        playBgm();
 
         localStorage.setItem(STORAGE_KEY_DATE, getKSTDateString());
         localStorage.setItem(STORAGE_KEY_GUEST, key);
@@ -678,24 +670,16 @@
     }
   });
 
-function playYoutubeMusic(){
-  const player = document.getElementById('youtubeMusicPlayer');
+function playBgm(){
+  const bgm = document.getElementById('bgm');
 
-  if(player.innerHTML !== '') return;
+  if(!bgm) return;
 
-const videoId = 'eu14QRAIHcM';
+  bgm.volume = 0.35;
 
-  player.innerHTML =
-    '<iframe '
-    + 'width="1" '
-    + 'height="1" '
-    + 'src="https://www.youtube.com/embed/' + videoId
-    + '?autoplay=1&loop=1&playlist=' + videoId
-    + '&controls=0&rel=0&playsinline=1" '
-    + 'title="Background music" '
-    + 'allow="autoplay; encrypted-media" '
-    + 'frameborder="0">'
-    + '</iframe>';
+  bgm.play().catch(function(){
+    /* 브라우저에서 재생이 잠시 막힌 경우 오류를 표시하지 않음 */
+  });
 }
 
 </script>
