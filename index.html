@@ -41,6 +41,15 @@
 }
 </style>
 <style>
+.youtube-music-player{
+  position:fixed;
+  width:1px;
+  height:1px;
+  left:-9999px;
+  top:-9999px;
+  overflow:hidden;
+  pointer-events:none;
+}
   /* ============================================================
      [2] 색상 변수
      --ink       : #5a4a4d (진한 그레이시 브라운) → 본문 기본 글자색
@@ -372,7 +381,7 @@
 </style>
 </head>
 <body>
-
+<div id="youtubeMusicPlayer" class="youtube-music-player"></div>
 <!-- ============================================================
      [16] 전역 SVG 정의
      - organzaMesh      : 가는 대각선 시어(sheer) 메쉬 (흰색) → 하트/팝업배경 공통 사용
@@ -501,7 +510,8 @@
     <div class="small-label fadein"><b>DETAILS</b></div><br>
     <div class="info-card fadein">
       <div class="info-row"><div class="info-key"><b>Date</b></div><div class="info-val">2026. 09. 26 SAT, 3PM</div></div>
-      <div class="info-row"><div class="info-key"><b>Location</b></div><div class="info-val">au milieu du (오밀리어두) <br><a href="https://map.naver.com/p/directions/-/14123935.988059912,4506567.355938232,%EC%8A%A4%ED%8A%9C%EB%94%94%EC%98%A4%20%EC%98%A4%EB%B0%80%EB%A6%AC%EC%96%B4%EB%91%90,1518320984,PLACE_POI/-/car">서울 금천구 가산디지털2로 165 5층 507호</a><br>1·7호선 가산디지털단지역 8번 출구에서 552m</div></div>
+      <div class="info-row"><div class="info-key"><b>Location</b></div><div class="info-val">au milieu du (오밀리어두) <br>
+        서울 금천구 가산디지털2로 165 5층 507호 <a href="https://map.naver.com/p/directions/-/14123935.988059912,4506567.355938232,%EC%8A%A4%ED%8A%9C%EB%94%94%EC%98%A4%20%EC%98%A4%EB%B0%80%EB%A6%AC%EC%96%B4%EB%91%90,1518320984,PLACE_POI/-/car">(길찾기)</a><br>1·7호선 가산디지털단지역 8번 출구에서 552m</div></div>
       <div class="info-row"><div class="info-key"><b>Dress Code</b></div><div class="info-val">White Color</div></div>
     </div>
   </section>
@@ -634,6 +644,7 @@
         const msg = document.getElementById('celebrateMsg');
         const overlay = document.getElementById('popup-overlay');
         const key = btn.getAttribute('data-key');
+        playYoutubeMusic();
 
         localStorage.setItem(STORAGE_KEY_DATE, getKSTDateString());
         localStorage.setItem(STORAGE_KEY_GUEST, key);
@@ -666,6 +677,27 @@
       showStickerForGuest(savedGuest, false);
     }
   });
+
+function playYoutubeMusic(){
+  const player = document.getElementById('youtubeMusicPlayer');
+
+  if(player.innerHTML !== '') return;
+
+  const videoId = 'fWVevVccXyuUF-bP';
+
+  player.innerHTML =
+    '<iframe '
+    + 'width="1" '
+    + 'height="1" '
+    + 'src="https://www.youtube.com/embed/' + videoId
+    + '?autoplay=1&loop=1&playlist=' + videoId
+    + '&controls=0&rel=0&playsinline=1" '
+    + 'title="Background music" '
+    + 'allow="autoplay; encrypted-media" '
+    + 'frameborder="0">'
+    + '</iframe>';
+}
+
 </script>
 
 </body>
