@@ -1,2 +1,671 @@
-# sohee
-Bridal Shower Invitation
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bridal Shower Invitation</title>
+
+<!-- ============================================================
+     [1] 폰트 로드
+     - Special Elite   : 영문 타자기 폰트 (라벨, 날짜, 타임라인 시간, 팝업 서브라벨, 클릭 멘트)
+     - Playwrite DE VA : 팝업 하트 안 영문 이름 필기체
+     - Noto Sans KR    : 한글 본문(팝업 타이틀, 상세정보, 타임라인, 공지사항) 전용
+     - UhBeeMiMi(어비 미미체) : 게스트 스티커 텍스트 전용 (@font-face로 별도 로드)
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Playwrite+DE+VA&family=Playwrite+ID+Guides&family=Cormorant+Garamond:wght@300;400;500;600&family=Jersey+10&family=Coral+Pixels&family=Barrio&family=Yuyu+Short&family=Orbit&family=Asta+Sans:wght@400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css">
+<style>
+@font-face{
+  font-family:'UhBeeMiMi';
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_five@.2.0/UhBeeMiMi.woff') format('woff');
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
+}
+
+@font-face{
+  font-family:'GmarketSans';
+  src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+  font-weight:500;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:'NanumSquare';
+  src:url('https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css');
+  font-weight:normal;
+  font-style:normal;
+  font-display:swap;
+}
+</style>
+<style>
+  /* ============================================================
+     [2] 색상 변수
+     --ink       : #5a4a4d (진한 그레이시 브라운) → 본문 기본 글자색
+     --ink-soft  : #8a6f74 (연한 그레이시 핑크브라운) → 보조 라벨/서브 텍스트
+     --pink-deep : #c2677a (로즈핑크) → 타이틀, 강조 라벨, 타임라인 포인트 색
+     ============================================================ */
+  :root{
+    --ink:#5a4a4d;
+    --ink-soft:#8a6f74;
+    --pink-deep:#c2677a;
+  }
+  *{box-sizing:border-box;}
+  /* 전체 배경(body) : 화이트 / 기본 글자색 : --ink / 기본 폰트 : Cormorant Garamond(로드 안 된 상태라 실제로는 브라우저 기본 세리프체로 폴백) */
+  html,body{margin:0;padding:0;font-family:'Cormorant Garamond',monospace;color:var(--ink);background:#ffffff;overflow-x:hidden;}
+
+  /* [3] 페이지 전체를 감싸는 연핑크 그라디언트 배경판 (크림베이지 → 핑크로 교체된 버전) */
+  .paper{
+    position:relative;min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,0.6), transparent 55%),
+      radial-gradient(ellipse at 85% 25%, rgba(250,245,247,0.4), transparent 50%),
+      radial-gradient(ellipse at 60% 90%, rgba(248,242,244,0.35), transparent 60%),
+      linear-gradient(180deg,#fbe9ee 0%, #f8dde5 45%, #f3d0db 100%);
+  }
+
+  /* [4] 동동 떠다니는 하트 배경 (색상은 각 span의 --heart-color 인라인 변수로 개별 지정) */
+  .floating-hearts {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .heart {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    display: block;
+    border-radius: 2px;
+    background: var(--heart-color);
+    opacity: var(--opacity);
+    transform: rotate(45deg);
+    animation: floatHeart var(--duration) ease-in-out infinite var(--delay);
+  }
+  .heart::before,
+  .heart::after {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    content: "";
+    border-radius: 50%;
+    background: inherit;
+  }
+  .heart::before { left: -50%; }
+  .heart::after { top: -50%; }
+  @keyframes floatHeart {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(45deg) scale(1); }
+    50% { transform: translate3d(var(--drift), -28px, 0) rotate(63deg) scale(1.13); }
+  }
+
+  /* [5] 콘텐츠 섹션 공통 폭/여백 (인트로~아웃트로 모든 <section> 공통, padding:70px 34px) */
+  section{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:70px 34px;text-align:center;}
+  .divider{width:120px;height:14px;margin:26px auto;opacity:0.7;}
+  .divider svg{width:100%;height:100%;}
+
+  /* h2 : 현재 마크업에서는 미사용 / 폰트 : Playwrite Cuba Guides(미로드, 폴백 cursive) / 글씨색 : --ink */
+  h2{font-family:'Playwrite Cuba Guides',cursive;font-weight:400;letter-spacing:1px;color:var(--ink);margin:0;}
+
+  /* "DETAILS" "TIMELINE" "NOTICE" 라벨 : 폰트 Special Elite / 글씨색 --ink-soft(#8a6f74) / 위치 : 각 섹션 상단 */
+  .small-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;font-family:'Special Elite',monospace;}
+
+  /* 인트로 하단 안내 문구용 스타일 (현재 마크업에서는 미사용) : 폰트 Noto Sans KR(한글)/Special Elite(영문 폴백) / 글씨색 --ink */
+  .typewriter{font-family:'Noto Sans KR','Special Elite',monospace;font-weight:300;font-size:13px;line-height:1.9;color:var(--ink);}
+  .fadein{opacity:0;transform:translateY(14px);animation:riseIn 1.1s ease forwards;}
+  @keyframes riseIn{to{opacity:1;transform:translateY(0);}}
+
+  /* [6] 손그림 아이콘 공통 배치/애니메이션 (현재 인트로/내용 illust-row는 비어있고 아웃트로에만 하트 아이콘 존재) */
+  .illust-row{display:flex;justify-content:center;align-items:flex-end;gap:14px;margin:18px 0 6px;flex-wrap:wrap;}
+  .float-ill{display:inline-block;animation:bob 4.5s ease-in-out infinite;}
+  .float-ill:nth-child(2){animation-duration:5.2s;animation-delay:0.3s;}
+  .float-ill:nth-child(3){animation-duration:4.8s;animation-delay:0.6s;}
+  .float-ill:nth-child(4){animation-duration:5.6s;animation-delay:0.15s;}
+  @keyframes bob{0%,100%{transform:translateY(0px) rotate(-1deg);}50%{transform:translateY(-10px) rotate(1.5deg);}}
+
+  /* ============================================================
+     [7] 인트로 섹션
+     ============================================================ */
+  .intro-wrap{padding-top:80px;padding-bottom:24px;position:relative;}
+
+  /* "Bridal Shower Invitation" 타이틀 : 폰트 Playwrite Indonesia(미로드, 폴백 cursive) / 글씨색 --pink-deep(#c2677a) / letter-spacing 1.5px(자간) */
+  .intro-title{font-family:'Barrio', cursive;font-size:35px;line-height:1.15;color:var(--pink-deep);font-weight:400;margin:0;letter-spacing:1.5px;}
+
+  /* "Joyfully we invite you" 서브 문구 : 폰트 Orbit / 글씨색 --ink-soft(#8a6f74) / 위치 : 타이틀 바로 아래 */
+  .intro-sub{margin-top:10px;font-family:'Orbit',monospace;font-size:10.5px;letter-spacing:3px;color:var(--ink-soft);text-transform:uppercase;}
+
+  /* "2026.09.26 SAT" 날짜 : 폰트 Special Elite / 글씨색 --ink-soft / 위치 : intro-sub 아래 */
+  .intro-date{margin-top:16px;font-family:'Orbit',monospace;font-size:10px;letter-spacing:4px;color:var(--ink-soft);}
+
+  /* ============================================================
+     [게스트 스티커] 하트를 누르면 인트로 타이틀 밑 빈 공간에 나타나는 스티커
+     - 폰트 : UhBeeMiMi (어비 미미체)
+     - 내용은 JS의 guestContent 객체에서 각 data-key 별로 자유롭게 수정 가능
+     ============================================================ */
+  .guest-sticker-slot{
+    min-height:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-top:18px;
+  }
+  /* 스티커 배경 : 핑크 그라디언트(#ffe3ef → #ffd0e6) / 테두리 : 로즈핑크 점선(#e79bab) / 글씨색 : #a8456a(진한 로즈핑크) / 폰트 : UhBeeMiMi */
+  .guest-sticker{
+    display:inline-block;
+    padding:10px 22px;
+    border-radius:999px;
+    background:linear-gradient(135deg, #ffe3ef 0%, #ffd0e6 100%);
+    border:1.5px dashed #e79bab;
+    box-shadow:0 6px 16px rgba(200,120,145,0.25);
+    font-family:'UhBeeMiMi','Noto Sans KR',cursive;
+    font-size:15px;
+    color:#a8456a;
+    opacity:0;
+    transform:scale(0.5)
+    transition:opacity 0.6s cubic-bezier(.22,1.2,.36,1), transform 0.6s cubic-bezier(.22,1.2,.36,1);
+  }
+  .guest-sticker.show{
+    opacity:1;
+    transform:scale(1)
+  }
+  /* 스티커 안 "GUEST." 라벨 : 폰트 Special Elite / 글씨색 --pink-deep(#c2677a) */
+  .guest-sticker .guest-label{
+    font-family:'Special Elite',monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    color:#c2677a;
+    margin-right:6px;
+    text-transform:uppercase;
+  }
+
+  /* ============================================================
+     [9] 내용(Details) 섹션 : Date / Location / Dress Code
+     ============================================================ */
+  .info-card{text-align:left;max-width:420px;margin:0 auto;padding:26px 22px;border:1px dashed rgba(200,120,145,0.35);border-radius:8px;background:rgba(250,248,249,0.7);}
+  .info-row{margin-bottom:18px;}
+  .info-row:last-child{margin-bottom:0;}
+
+  /* "Date" "Location" "Dress Code" 라벨(<b> 굵게) : 폰트 Special Elite / 글씨색 --pink-deep(#c2677a) */
+  .info-key{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--pink-deep);margin-bottom:4px;font-family:'Special Elite',monospace;}
+
+  /* 항목 실제 내용(날짜/주소/드레스코드) : 폰트 Noto Sans KR / 글씨색 --ink(#5a4a4d) */
+  .info-val{font-size:13px;line-height:1.9;color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;}
+
+  /* ============================================================
+     [10] 타임라인 섹션
+     ============================================================ */
+  .timeline{position:relative;max-width:420px;margin:30px auto 0;text-align:left;padding-left:26px;}
+  .timeline::before{content:"";position:absolute;left:6px;top:4px;bottom:4px;width:1px;background:repeating-linear-gradient(180deg,#f3c9d4 0 6px, transparent 6px 10px);}
+  .t-item{position:relative;margin-bottom:26px;}
+  .t-item:last-child{margin-bottom:0;}
+  .t-item::before{content:"";position:absolute;left:-26px;top:4px;width:9px;height:9px;border-radius:50%;background:#fff;border:1.5px solid var(--pink-deep);}
+
+  /* 시간 표기(15:00 등, <b> 굵게) : 폰트 Special Elite / 글씨색 --pink-deep(#c2677a) */
+  .t-time{font-size:12px;color:var(--pink-deep);letter-spacing:1px;margin-bottom:2px;font-family:'Special Elite',monospace;}
+
+  /* 일정 설명(무인스튜디오 입장 등) : 폰트 Noto Sans KR / 글씨색 --ink(#5a4a4d) */
+  .t-desc{font-size:13px;color:var(--ink);font-family:'Noto Sans KR',sans-serif;font-weight:300;}
+
+  /* ============================================================
+     [11] 공지사항 섹션 : 전체 폰트 Cormorant Garamond(미로드, 폴백 세리프) / 글씨색 --ink, 불릿(✦) 색상만 #c2677a(로즈핑크)
+     ============================================================ */
+  .notice-box{max-width:440px;margin:0 auto;text-align:left;font-size:12.5px;line-height:2.2;color:var(--ink);padding:24px;font-family:'Noto Sans KR',sans-serif;font-weight:300;
+    background:rgba(255,255,255,0.3);}
+  .notice-box li{margin-bottom:2px;list-style:none;padding-left:16px;position:relative;}
+  .notice-box li::before{content:"✦";position:absolute;left:0;top:0;color:#c2677a;font-size:10px;}
+.notice-box a{
+  color: inherit;
+  text-decoration: none;
+}
+.notice-box a:visited{
+  color: inherit;
+}
+.info-val a{
+  color: inherit;
+  text-decoration: none;
+}
+.info-val a:visited{
+  color: inherit;
+}
+.notice-box .arrow-small{
+  font-size: 8px;
+  vertical-align: 1.2px;
+}
+  /* ============================================================
+     [12] 아웃트로 섹션
+     ============================================================ */
+  .outro{padding-bottom:120px;}
+
+  /* "SHJW wedding day / 2026.11.28 SAT 12PM" : 폰트 Coral Pixels / 글씨색 --ink(#5a4a4d) */
+.outro-msg{font-family:'Special Elite',cursive;font-size:10px;color:var(--ink-soft);line-height:1.5;margin:20px 0;}
+
+  /* "with love ♡" : 폰트 Special Elite / 글씨색 --ink-soft(#8a6f74) */
+  .outro-sub{font-size:11px;letter-spacing:2px;color:var(--ink-soft);font-family:'Special Elite',monospace;}
+
+  /* ============================================================
+     [13] 팝업 오버레이 & 카드
+     - 오버레이 배경 : 화이트 반투명(rgba(255,255,255,0.55)) + blur(4px)
+     - 카드 배경 : 화이트 반투명(rgba(255,255,255,0.5)) + blur(8px), 스캘럽 clip-path는 이번 버전에서 제거된 상태
+     ============================================================ */
+  #popup-overlay{
+    position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition:opacity 1.3s ease;
+  }
+  #popup-overlay.fadeout{opacity:0;pointer-events:none;}
+
+  .popup-card{
+    position:relative;width:90%;max-width:420px;padding:34px 24px 30px;text-align:center;border-radius:6px;
+    overflow:hidden;isolation:isolate;
+    box-shadow:0 25px 70px rgba(180,150,160,0.2);
+    background: rgba(255,255,255,0.5);
+    backdrop-filter: blur(8px) saturate(1.05);
+    -webkit-backdrop-filter: blur(8px) saturate(1.05);
+    border:1px solid rgba(255,255,255,0.8);
+  }
+  /* 카드 안쪽에 깔리는 오간자 레이스 질감 (organzaMesh + organzaLaceMotif 패턴, SVG defs 참고) */
+  .popup-card .organza-bg{ position:absolute;inset:0;z-index:0;pointer-events:none; }
+  .popup-inner, .celebrate-msg{position:relative;z-index:1;}
+
+  /* "이름을 선택해 주세요" 팝업 타이틀 : 폰트 Noto Sans KR / 글씨색 #8a5c67(로즈브라운) */
+  .popup-title{font-family:'Noto Sans KR',sans-serif;font-weight:500;font-size:13px;letter-spacing:1.5px;color:#8a5c67;margin-bottom:22px;}
+  /* "PLEASE SELECT YOUR NAME" 서브 라벨 : 폰트 Special Elite / 글씨색 #b58c94(연한 로즈브라운) */
+  .popup-title .sub{display:block;font-family:'Special Elite',monospace;font-size:10px;letter-spacing:2px;color:#b58c94;margin-top:4px;}
+
+  /* ============================================================
+     [14] 팝업 안 레이스 하트 버튼 (Dahye/Youngjin/Eunju/Haram)
+     - 하트 안 이름 텍스트 : 폰트 Playwrite DE VA / 하트마다 다른 파스텔 글씨색(#f9cece,#f7bfd5,#e5c6e2,#f9d8ce)
+     - 마우스 오버 시 : 글씨색 → #FFFFFF(흰색) / 하트 배경 → heartHoverFill 그라디언트(연핑크→핫핑크→퍼플, SVG defs 참고)
+     ============================================================ */
+.heart-name-text{
+  transition: fill 0.3s ease;
+}
+.heart-btn:hover .heart-name-text{
+  fill: #FFFFFF !important;
+}
+.hearts-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:115px;gap:14px 10px;}
+.heart-btn{position:relative;width:100%;height:100%;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;}
+.heart-btn svg{
+  width:100%;height:100%;display:block;
+  filter: drop-shadow(0 2px 5px rgba(180,140,160,0.18));
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), filter 0.35s ease;
+}
+.heart-btn:hover svg{
+  transform: scale(1.05);
+  filter:
+    drop-shadow(0 14px 20px rgba(160,90,150,0.32))
+    drop-shadow(0 2px 3px rgba(255,255,255,0.7));
+}
+.heart-body-fill{
+  transition: fill 0.4s ease;
+}
+.heart-btn:hover .heart-body-fill{
+  fill: url(#heartGlassFill);
+}
+.heart-outline{
+  stroke: rgba(255,255,255,0);
+  transition: stroke 0.35s ease;
+}
+.heart-btn:hover .heart-outline{
+  stroke: rgba(255,255,255,0.85);
+}
+.glass-highlight{
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.heart-btn:hover .glass-highlight{
+  opacity: 1;
+}
+  /* "WE CAN'T WAIT TO CELEBRATE WITH YOU" 클릭 후 멘트 : 폰트 Special Elite(타자기 느낌) / 글씨색 #8a5c67 / 위치 : 팝업 카드 중앙(하트 사라진 자리) */
+  .celebrate-msg{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 30px;
+    opacity:0;transition:opacity 0.6s ease;
+    font-family:'Special Elite',monospace;font-size:11.5px;letter-spacing:0.5px;line-height:1.9;color:#8a5c67;
+    pointer-events:none;
+  }
+  .celebrate-msg.show{opacity:1;}
+  .popup-inner{transition:opacity 0.4s ease;}
+  .popup-inner.hide{opacity:0;}
+
+#popup-overlay.celebrating{
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+#popup-overlay.celebrating .popup-card{
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+#popup-overlay.celebrating .organza-bg{
+  display: none;
+}
+
+/* 다시 선택하기 버튼 */
+.reselect-btn{
+  display:block;
+  margin:8px auto 0;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:7pt;
+  color:var(--ink-soft);
+  background:none;
+  border:none;
+  text-decoration:underline;
+  cursor:pointer;
+  padding:2px 4px;
+}
+
+  /* [15] 팝업 종료 시 터지는 오로라 반짝이 (JS가 동적으로 .spark 엘리먼트 생성, 색상은 auroraColors 배열 참고) */
+  .sparkle-layer{position:fixed;inset:0;z-index:1000;pointer-events:none;}
+  .spark{position:absolute;width:8px;height:8px;border-radius:50%;opacity:0;transform:scale(0);}
+  @keyframes sparkPop{
+    0%{opacity:0;transform:scale(0) rotate(0deg);}
+    35%{opacity:1;transform:scale(1.4) rotate(90deg);}
+    100%{opacity:0;transform:scale(0.2) rotate(180deg) translateY(-40px);}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     [16] 전역 SVG 정의
+     - organzaMesh      : 가는 대각선 시어(sheer) 메쉬 (흰색) → 하트/팝업배경 공통 사용
+     - organzaLaceMotif : 스캘럽 원형 레이스 모티프 (흰색) → 하트 테두리, 팝업배경 공통 사용
+     - organzaSheen     : 하트 안쪽 은은한 광택 그라디언트 (연핑크 계열 #fdeef1 → #f6c9d4)
+     - heartHoverFill   : 하트 마우스오버 시 채워지는 그라디언트 (연핑크 #ffd6e8 → 핫핑크 #e478b8 → 퍼플 #b06cc9)
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <pattern id="organzaMesh" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#ffffff" stroke-width="0.5" opacity="0.9"/>
+      <line x1="0" y1="0" x2="6" y2="0" stroke="#ffffff" stroke-width="0.5" opacity="0.6"/>
+    </pattern>
+    <pattern id="organzaLaceMotif" patternUnits="userSpaceOnUse" width="16" height="16">
+      <circle cx="8" cy="8" r="3" fill="none" stroke="#ffffff" stroke-width="0.9" opacity="0.95"/>
+      <circle cx="8" cy="8" r="0.9" fill="#ffffff" opacity="0.95"/>
+      <path d="M0,8 Q4,3 8,8 Q12,13 16,8" fill="none" stroke="#ffffff" stroke-width="0.55" opacity="0.6"/>
+    </pattern>
+    <radialGradient id="organzaSheen" cx="50%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#fdeef1" stop-opacity="0.95"/>
+      <stop offset="70%" stop-color="#fbdde4" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#f6c9d4" stop-opacity="0.6"/>
+    </radialGradient>
+<linearGradient id="heartGlassFill" x1="0%" y1="0%" x2="100%" y2="100%">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+  <stop offset="45%" stop-color="#ffd6e8" stop-opacity="0.5"/>
+  <stop offset="100%" stop-color="#b06cc9" stop-opacity="0.32"/>
+</linearGradient>
+<radialGradient id="heartGlassHighlight" cx="35%" cy="22%" r="42%">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+  <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+</radialGradient>
+  </defs>
+</svg>
+
+<!-- ============================================================
+     [17] 본인확인 팝업 (페이지 진입 시 최초 노출)
+     - 하트 4개 : Dahye(#f9cece) / Youngjin(#f7bfd5) / Eunju(#e5c6e2) / Haram(#f9d8ce)
+       각 하트 이름 텍스트 폰트 : Playwrite DE VA
+     ============================================================ -->
+<div id="popup-overlay">
+  <div class="popup-card">
+    <svg class="organza-bg" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <rect width="100" height="100" fill="url(#organzaMesh)" opacity="0.5"/>
+      <rect width="100" height="100" fill="url(#organzaLaceMotif)" opacity="0.35"/>
+    </svg>
+    <div class="popup-inner" id="popupInner">
+      <div class="popup-title">이름을 선택해 주세요
+        <span class="sub">PLEASE SELECT YOUR NAME</span>
+      </div>
+      <div class="hearts-grid">
+        <!-- 하트 1 : Dahye / 글씨색 #f9cece -->
+        <div class="heart-btn" data-key="dahye"><svg viewBox="0 0 150 130">
+          <path class="heart-body-fill" d="M75,20 C60,-6 20,-1 15,32 C10,66 42,89 75,118 C108,89 140,66 135,32 C130,-1 90,-6 75,20 Z" fill="url(#organzaSheen)" opacity="0.55"/>
+          <path class="heart-outline" d="M75,20 C60,-6 20,-1 15,32 C10,66 42,89 75,118 C108,89 140,66 135,32 C130,-1 90,-6 75,20 Z" fill="none" stroke-width="1.3"/>
+<ellipse class="glass-highlight" cx="60" cy="35" rx="32" ry="18" fill="url(#heartGlassHighlight)" transform="rotate(-18 60 35)"/>
+          <text class="heart-name-text" x="75" y="60" text-anchor="middle" font-family="'Playwrite DE VA', cursive" font-size="18" fill="#f9cece">Dahye</text>
+        </svg></div>
+        <!-- 하트 2 : Youngjin / 글씨색 #f7bfd5 -->
+        <div class="heart-btn" data-key="youngjin"><svg viewBox="0 0 150 130">
+          <path class="heart-body-fill" d="M75,20 C60,-6 20,-1 15,32 C10,66 42,89 75,118 C108,89 140,66 135,32 C130,-1 90,-6 75,20 Z" fill="url(#organzaSheen)" opacity="0.55"/>
+          <path class="heart-outline" d="M75,20 C60,-6 20,-1 15,32 C10,66 42,89 75,118 C108,89 140,66 135,32 C130,-1 90,-6 75,20 Z" fill="none" stroke-width="1.3"/>
+<ellipse class="glass-highlight" cx="60" cy="35" rx="32" ry="18" fill="url(#heartGlassHighlight)" transform="rotate(-18 60 35)"/>
+          <text class="heart-name-text" x="75" y="60" text-anchor="middle" font-family="'Playwrite DE VA', cursive" font-size="18" fill="#f7bfd5">Youngjin</text>
+        </svg></div>
+        <!-- 하트 3 : Eunju / 글씨색 #e5c6e2 -->
+        <div class="heart-btn" data-key="eunju"><svg viewBox="0 0 150 130">
+          <path class="heart-body-fill" d="M75,20 C60,-6 20,-1 15,32 C10,66 42,89 75,118 C108,89 140,66 135,32 C130,-1 90,-6 75,20 Z" fill="url(#organzaSheen)" opacity="0.55"/>
+          <path class="heart-outline" d="M75,20 C60,-6 20,-1 15,32 C10,66 42,89 75,118 C108,89 140,66 135,32 C130,-1 90,-6 75,20 Z" fill="none" stroke-width="1.3"/>
+<ellipse class="glass-highlight" cx="60" cy="35" rx="32" ry="18" fill="url(#heartGlassHighlight)" transform="rotate(-18 60 35)"/>
+          <text class="heart-name-text" x="75" y="60" text-anchor="middle" font-family="'Playwrite DE VA', cursive" font-size="18" fill="#e5c6e2">Eunju</text>
+        </svg></div>
+        <!-- 하트 4 : Haram / 글씨색 #f9d8ce -->
+        <div class="heart-btn" data-key="haram"><svg viewBox="0 0 150 130">
+          <path class="heart-body-fill" d="M75,20 C60,-6 20,-1 15,32 C10,66 42,89 75,118 C108,89 140,66 135,32 C130,-1 90,-6 75,20 Z" fill="url(#organzaSheen)" opacity="0.55"/>
+          <path class="heart-outline" d="M75,20 C60,-6 20,-1 15,32 C10,66 42,89 75,118 C108,89 140,66 135,32 C130,-1 90,-6 75,20 Z" fill="none" stroke-width="1.3"/>
+<ellipse class="glass-highlight" cx="60" cy="35" rx="32" ry="18" fill="url(#heartGlassHighlight)" transform="rotate(-18 60 35)"/>
+          <text class="heart-name-text" x="75" y="60" text-anchor="middle" font-family="'Playwrite DE VA', cursive" font-size="18" fill="#f9d8ce">Haram</text>
+        </svg></div>
+      </div>
+    </div>
+    <div class="celebrate-msg" id="celebrateMsg">WE CAN'T WAIT<br>TO CELEBRATE WITH YOU</div>
+  </div>
+</div>
+
+<!-- [18] 팝업 종료 시 JS가 스파클 엘리먼트를 채워 넣는 레이어 -->
+<div class="sparkle-layer" id="sparkleLayer"></div>
+
+<div class="paper">
+
+  <!-- 하트 배경 (색상은 각 span의 --heart-color 로 개별 지정) -->
+  <div class="floating-hearts" aria-hidden="true">
+    <span class="heart" style="--size:9px; --heart-color:#f3b9c8; --opacity:.48; --duration:7s; --delay:-2s; --drift:18px; top:7%; left:7%;"></span>
+    <span class="heart" style="--size:7px; --heart-color:#cfc0eb; --opacity:.46; --duration:8s; --delay:-4s; --drift:-13px; top:18%; left:89%;"></span>
+    <span class="heart" style="--size:11px; --heart-color:#f5d99e; --opacity:.4; --duration:9s; --delay:-1s; --drift:14px; top:37%; left:4%;"></span>
+    <span class="heart" style="--size:8px; --heart-color:#bee2cf; --opacity:.55; --duration:6s; --delay:-3s; --drift:-17px; top:55%; left:93%;"></span>
+    <span class="heart" style="--size:6px; --heart-color:#f3b9c8; --opacity:.5; --duration:7.5s; --delay:-5s; --drift:16px; top:76%; left:8%;"></span>
+    <span class="heart" style="--size:10px; --heart-color:#d8caef; --opacity:.42; --duration:10s; --delay:-2.5s; --drift:-12px; top:87%; left:88%;"></span>
+    <span class="heart" style="--size:7px; --heart-color:#f8cbd4; --opacity:.44; --duration:8.5s; --delay:-7s; --drift:18px; top:28%; left:22%;"></span>
+    <span class="heart" style="--size:5px; --heart-color:#f7e8ad; --opacity:.58; --duration:6.5s; --delay:-1.5s; --drift:-9px; top:66%; left:78%;"></span>
+  </div>
+
+  <!-- ---------- [19-1] 인트로 섹션 ----------
+       - Bridal Shower Invitation : Playwrite Indonesia(폴백) / 색상 #c2677a
+       - Joyfully we invite you   : Special Elite / 색상 #8a6f74
+       - 2026. 09. 26 SAT         : Special Elite / 색상 #8a6f74
+       - 게스트 스티커(하트 클릭 시 노출) : UhBeeMiMi / 글씨색 #a8456a, 라벨(GUEST.)만 Special Elite / #c2677a
+       ※ <br> 태그로 섹션 내 줄 간격(공백)을 수동 조정한 상태
+  -->
+  <section class="intro-wrap">
+    <div class="illust-row"></div>
+
+    <div class="fadein">
+      <div class="intro-title">Bridal Shower<br>Invitation</div><br>
+      <div class="intro-sub">Joyfully we invite you</div>
+    <div class="intro-date fadein">2026.09.26 SAT</div><br>
+    </div>
+    <div class="guest-sticker-slot" id="guestStickerSlot"></div>
+  </section>
+
+  <!-- ---------- [19-2] 내용(Details) 섹션 ----------
+       - Date/Location/Dress Code 라벨 : Special Elite / 색상 #c2677a
+       - 실제 값(날짜/주소/드레스코드) : Noto Sans KR / 색상 #5a4a4d
+  -->
+  <section>
+    <div class="small-label fadein"><b>DETAILS</b></div><br>
+    <div class="info-card fadein">
+      <div class="info-row"><div class="info-key"><b>Date</b></div><div class="info-val">2026. 09. 26 SAT, 3PM</div></div>
+      <div class="info-row"><div class="info-key"><b>Location</b></div><div class="info-val">au milieu du (오밀리어두) <br><a href="https://map.naver.com/p/directions/-/14123935.988059912,4506567.355938232,%EC%8A%A4%ED%8A%9C%EB%94%94%EC%98%A4%20%EC%98%A4%EB%B0%80%EB%A6%AC%EC%96%B4%EB%91%90,1518320984,PLACE_POI/-/car">서울 금천구 가산디지털2로 165 5층 507호</a><br>1·7호선 가산디지털단지역 8번 출구에서 552m</div></div>
+      <div class="info-row"><div class="info-key"><b>Dress Code</b></div><div class="info-val">White Color</div></div>
+    </div>
+  </section>
+
+  <!-- ---------- [19-3] 타임라인 섹션 ----------
+       - 시간(15:00 등) : Special Elite / 색상 #c2677a
+       - 설명(무인스튜디오 입장 등) : Noto Sans KR / 색상 #5a4a4d
+  -->
+  <section>
+    <div class="small-label fadein"><b>TIME LINE</b></div><br>
+    <div class="timeline fadein">
+      <div class="t-item"><div class="t-time"><b>15:00</b></div><div class="t-desc">무인스튜디오 입장</div></div>
+      <div class="t-item"><div class="t-time"><b>15:00 ~ 17:30</b></div><div class="t-desc">브라이덜샤워</div></div>
+      <div class="t-item"><div class="t-time"><b>17:30 ~ 18:00</b></div><div class="t-desc">분리수거 및 정리</div></div>
+      <div class="t-item"><div class="t-time"><b>18:30 ~</b></div><div class="t-desc">저녁 식사</div></div>
+    </div>
+  </section>
+
+  <!-- ---------- [19-4] 공지사항 섹션 ----------
+       - 전체 : Cormorant Garamond(폴백) / 색상 #5a4a4d
+       - 불릿(✦) 색상만 : #a9c3d8
+  -->
+  <section>
+    <div class="small-label fadein"><b>NOTICE</b></div><br>
+    <ul class="notice-box fadein">
+      <li>ROOM TYPE — au milieu du Room C (Pink)</li>
+      <li>주차 : 유료</li>
+      <li><a href="https://aumilieudu.notion.site/18b85e51952880d5b6b9d4594427042a?pvs=149">드레스, 소품 확인하기 <span class="arrow-small">▶</span></a></li>
+      <li>구비 물품 : 고데기, 스팀다리미, 행거, 옷걸이, 충전기, 링조명 1대</li>
+      <li>Wifi Password : nice2meetU</li>
+    </ul>
+  </section>
+
+  <!-- ---------- [19-5] 아웃트로 섹션 ----------
+       - SHJW wedding day / 2026. 11. 28 SAT 12PM : Jersey 10(폴백) / 색상 #5a4a4d
+       - with love ♡ : Special Elite / 색상 #8a6f74
+  -->
+  <section class="outro">
+    <div class="illust-row">
+      <svg width="50" height="50" viewBox="0 0 60 60" class="float-ill">
+        <path d="M30,50 C10,35 5,15 20,10 C27,8 30,16 30,20 C30,16 33,8 40,10 C55,15 50,35 30,50 Z" fill="#fbdfe6" stroke="#e79bab" stroke-width="1.6"/>
+      </svg>
+    </div>
+    <div class="outro-msg fadein">SHJW wedding day<br>2026. 11. 28 SAT 12PM</div>
+    <div class="outro-sub fadein">with love ♡</div>
+  </section>
+
+</div>
+
+<!-- ============================================================
+     [20] 스크립트
+     - guestContent : 하트 클릭 시 스티커에 표시할 이름/라벨 내용 (자유 수정 가능)
+     - burstSparkles() : 오로라 컬러 반짝이를 화면 중앙에서 사방으로 터뜨림
+     - heart-btn 클릭 이벤트 : 하트 선택 → 축하 멘트 → 게스트 스티커 표시 → 팝업 종료 시퀀스
+     ============================================================ -->
+<script>
+  const guestContent = {
+    dahye:    { label: 'guest.', name: '지다혜 (Ji dahye)' },
+    youngjin: { label: 'guest.', name: '김영진 (Kim Youngjin)' },
+    eunju:    { label: 'guest.', name: '남궁은주 (Namgung Eunju)' },
+    haram:    { label: 'guest.', name: '유하람 (You Haram)' }
+  };
+
+  const STORAGE_KEY_DATE  = 'bsInvitePopupDate';
+  const STORAGE_KEY_GUEST = 'bsInviteSelectedGuest';
+
+  function getKSTDateString(){
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+  }
+
+  const auroraColors = ['#b7f0d1','#c9e4ff','#e0c3fc','#ffd6e8','#fff3b0','#a0e7e5'];
+  function burstSparkles(){
+    const layer = document.getElementById('sparkleLayer');
+    for(let i=0;i<40;i++){
+      const s = document.createElement('div');
+      s.className = 'spark';
+      const angle = Math.random()*Math.PI*2;
+      const dist = 60 + Math.random()*260;
+      const x = window.innerWidth/2 + Math.cos(angle)*dist*Math.random();
+      const y = window.innerHeight/2 + Math.sin(angle)*dist*Math.random();
+      const size = 3 + Math.random()*7;
+      const color = auroraColors[Math.floor(Math.random()*auroraColors.length)];
+      s.style.left = x + 'px'; s.style.top = y + 'px';
+      s.style.width = size + 'px'; s.style.height = size + 'px';
+      s.style.background = color;
+      s.style.boxShadow = '0 0 ' + (size*2) + 'px ' + color;
+      s.style.animation = 'sparkPop ' + (0.9 + Math.random()*0.8) + 's ease-out forwards';
+      s.style.animationDelay = (Math.random()*0.4) + 's';
+      layer.appendChild(s);
+      setTimeout(()=>s.remove(), 2200);
+    }
+  }
+
+  function showStickerForGuest(key, animate){
+    const content = guestContent[key] || { label:'guest.', name:key };
+    const slot = document.getElementById('guestStickerSlot');
+    slot.innerHTML = '<div>'
+      + '<div class="guest-sticker' + (animate ? '' : ' show') + '" id="guestSticker">'
+      + '<span class="guest-label">' + content.label + '</span>'
+      + content.name
+      + '</div>'
+      + '<button type="button" class="reselect-btn" id="reselectBtn">다시 선택하기</button>'
+      + '</div>';
+
+    if(animate){
+      requestAnimationFrame(function(){
+        document.getElementById('guestSticker').classList.add('show');
+      });
+    }
+    document.getElementById('reselectBtn').addEventListener('click', reopenPopup);
+  }
+
+  function reopenPopup(){
+    const overlay = document.getElementById('popup-overlay');
+    const inner = document.getElementById('popupInner');
+    const msg = document.getElementById('celebrateMsg');
+
+    overlay.classList.remove('fadeout', 'celebrating');
+    overlay.style.display = 'flex';
+    inner.classList.remove('hide');
+    msg.classList.remove('show');
+    document.querySelectorAll('.heart-btn').forEach(function(b){ b.style.pointerEvents = 'auto'; });
+  }
+
+  function bindHeartButtons(){
+    document.querySelectorAll('.heart-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        document.querySelectorAll('.heart-btn').forEach(function(b){ b.style.pointerEvents = 'none'; });
+        const inner = document.getElementById('popupInner');
+        const msg = document.getElementById('celebrateMsg');
+        const overlay = document.getElementById('popup-overlay');
+        const key = btn.getAttribute('data-key');
+
+        localStorage.setItem(STORAGE_KEY_DATE, getKSTDateString());
+        localStorage.setItem(STORAGE_KEY_GUEST, key);
+
+        inner.classList.add('hide');
+        setTimeout(function(){
+          msg.classList.add('show');
+          overlay.classList.add('celebrating');
+        }, 300);
+
+        setTimeout(function(){
+          burstSparkles();
+          overlay.classList.add('fadeout');
+          showStickerForGuest(key, true);
+          setTimeout(function(){ overlay.style.display = 'none'; }, 800);
+        }, 1000);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    bindHeartButtons();
+
+    const todayStr = getKSTDateString();
+    const savedDate = localStorage.getItem(STORAGE_KEY_DATE);
+    const savedGuest = localStorage.getItem(STORAGE_KEY_GUEST);
+
+    if(savedDate === todayStr && savedGuest){
+      document.getElementById('popup-overlay').style.display = 'none';
+      showStickerForGuest(savedGuest, false);
+    }
+  });
+</script>
+
+</body>
+</html>
