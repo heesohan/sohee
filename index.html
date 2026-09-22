@@ -242,6 +242,14 @@
   /* "SHJW wedding day / 2026.11.28 SAT 12PM" : 폰트 Coral Pixels / 글씨색 --ink(#5a4a4d) */
 .outro-msg{font-family:'Special Elite',cursive;font-size:10px;color:var(--ink-soft);line-height:1.5;margin:20px 0;}
 
+  .bridal-dday{
+  margin:6px 0 12px;
+  font-family:'Special Elite', monospace;
+  font-size:10px;
+  letter-spacing:2px;
+  color:var(--pink-deep);
+}
+  
   /* "with love ♡" : 폰트 Special Elite / 글씨색 --ink-soft(#8a6f74) */
   .outro-sub{font-size:11px;letter-spacing:2px;color:var(--ink-soft);font-family:'Special Elite',monospace;}
 
@@ -549,6 +557,7 @@
       </svg>
     </div>
     <div class="outro-msg fadein">SHJW wedding day<br>2026. 11. 28 SAT 12PM</div>
+    <div class="bridal-dday fadein" id="bridalDday">D-00</div>
     <div class="outro-sub fadein">with love ♡</div>
   </section>
 
@@ -682,7 +691,40 @@ function playBgm(){
     /* 브라우저에서 재생이 잠시 막힌 경우 오류를 표시하지 않음 */
   });
 }
+function updateBridalDday(){
+  const bridalDate = new Date('2026-09-26T15:00:00+09:00');
+  const now = new Date();
 
+  const todayKST = new Date(
+    now.toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+  );
+
+  const bridalDay = new Date(
+    bridalDate.toLocaleString('en-US', { timeZone: 'Asia/Seoul' })
+  );
+
+  todayKST.setHours(0, 0, 0, 0);
+  bridalDay.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.ceil(
+    (bridalDay - todayKST) / (1000 * 60 * 60 * 24)
+  );
+
+  const ddayEl = document.getElementById('bridalDday');
+
+  if(!ddayEl) return;
+
+  if(diffDays > 0){
+    ddayEl.textContent = 'D-' + String(diffDays).padStart(2, '0');
+  }else if(diffDays === 0){
+    ddayEl.textContent = 'D-DAY';
+  }else{
+    ddayEl.textContent = 'D+' + String(Math.abs(diffDays)).padStart(2, '0');
+  }
+}
+
+updateBridalDday();
+  
 </script>
 
 </body>
